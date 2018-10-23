@@ -1,0 +1,10 @@
+{
+  "name": "canvas-graph",
+  "version": "1.0.0",
+  "main": "src/canvas-graph.js",
+  "license": "MIT",
+  "author": "craigmc08",
+  "devDependencies": {
+    "eslint": "^5.7.0"
+  }
+}

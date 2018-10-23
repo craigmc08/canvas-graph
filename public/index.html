@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!-- File for testing canvas-graph.js -->
+<html>
+    <head>
+        <title>Canvas Graph Test</title>
+        <style>
+            body {
+                margin: 0;
+            }
+            #canvas-graph {
+                position: absolute;
+                top:0;left:0;right:0;bottom:0;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="canvasgraph"></div>
+
+        <script src="../src/canvas-graph.js"></script>
+        <script>
+            const { GraphLine, GraphCircle, GraphFunc, StrokeStyle, FillStyle } = CanvasGraph;
+
+            const graph = new CanvasGraph(document.getElementById('canvasgraph'), {
+                fullsize: true,
+            });
+            graph.drawGrid = true;
+            const func0 = new GraphFunc(x => Math.exp(-x*x), new StrokeStyle('rgb(230, 100, 100)', 3));
+            graph.AddFunc(func0);
+            graph.AddCircle(new GraphCircle(
+                0, 1,
+                0.03,
+                new StrokeStyle(),
+                new FillStyle('rgb(100, 150, 230)'),
+            ));
+            graph.AddCircle(new GraphCircle(
+                1, Math.exp(-1),
+                0.03,
+                new StrokeStyle(),
+                new FillStyle('rgb(100, 150, 230)'),
+            ));
+            graph.AddLine(new GraphLine(
+                0, 1,
+                1, Math.exp(-1),
+                new StrokeStyle('black', 2),
+            ));
+        </script>
+    </body>
+</html>
