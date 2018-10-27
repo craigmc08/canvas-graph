@@ -29,7 +29,6 @@ Open `public/index.html` and start making changes and refreshing. idk any way to
 - Add babel transpilation to allow library to work on older browsers
 - Make `GraphFunc` look better (smoother)
 - Add `GraphPoint` class that draws a circle that has same screen radius no matter the zoom
-- Add `GraphText` class that draws some text on the screen (option for unit sized or screen size)
 - Make scale adjust based on zoom level
 - Major + minor grid lines
 - Scale on axes and sides of screen if no axis

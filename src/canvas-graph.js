@@ -64,6 +64,9 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.drawGraph();
         }
 
+        /**
+         * Draws the entire graph
+         */
         drawGraph() {
             this.ctx.fillStyle = 'rgba(255, 255, 255)';
             this.ctx.fillRect(0, 0, this.width, this.height);
@@ -85,6 +88,10 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.others.forEach(other => other.draw(graphInfo));
         }
 
+        /**
+         * @private
+         * Draws the grid lines on the canvas
+         */
         drawLines() {
             const { ctx, center, radX, radY, gtc } = this;
             const gridScale = 1;
@@ -172,6 +179,10 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.drawGraph();
         }
 
+        /**
+         * @private
+         * Initialize event handlers
+         */
         initEventHandlers() {
             if (this.autosize) {
                 this.container.addEventListener('resize', this.resize.bind(this));
@@ -192,6 +203,10 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             window.addEventListener('mousewheel', this.onScroll.bind(this));
         }
 
+        /**
+         * @private
+         * Updates canvas size
+        */
         resize() {
             if (this.fullsize) {
                 this.width = window.innerWidth;
@@ -205,6 +220,10 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.aspect = this.width / this.height;
             this.setCanvasSize();
         }
+        /**
+         * @private
+         * Updates canvas size to match settings
+         */
         setCanvasSize() {
             this.canvas.width = this.width;
             this.canvas.height = this.height;
@@ -216,21 +235,43 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.canvas.style.cursor = 'move';
         }
 
+        /**
+         * Transforms a graph point to a Canvas point
+         * @param {number} x - X coordinate of graph point
+         * @param {number} y - Y coordinate of graph point
+         * @returns {number[]} Canvas coordinate [x, y]
+         */
         gtc(x, y) {
             const { center, radX, radY, width, height } = this;
             const cx = (x - center[0] + radX) / radX / 2 * width;
             const cy = (1 - (y - center[1] + radY) / radY / 2) * height;
             return [ Math.floor(cx), Math.floor(cy) ];
         }
+        /**
+         * Scales a graph scalar to a canvas scalar
+         * @param {number} n - Scalar in graph size
+         * @returns {number} Scalar in canvas (screen) size
+         */
         sgtc(n) {
             return n / this.radX / 2 * this.width;
         }
+        /**
+         * Transforms a canvas point to a graph point
+         * @param {number} x - X coordinate of canvas (screen) point
+         * @param {number} y - Y coordinate of canvas (screen) point
+         * @returns {number[]} Graph coordinate [x, y]
+         */
         ctg(x, y) {
             const { center, radX, radY, width, height } = this;
             const gx = x / width * radX * 2 + center[0] - radX;
             const gy = (1 - y / height) * radY * 2 + center[1] - radY;
             return [ gx, gy ];
         }
+        /**
+         * Scales a canvas scalar to a graph scalar
+         * @param {number} n - Scalar in canvas (screen) size
+         * @returns {number} Scalar in graph size
+         */
         sctg(n) {
             return n / this.width * this.radX * 2;
         }
@@ -276,7 +317,13 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.drawGraph();
         }
 
+        /**
+         * @property {number} radY The y area of the graph screen
+         */
         get radY() { return this.radX / this.aspect; }
+        /**
+         * @property {boolean} drawGrid Whether the background grid should be drawn
+         */
         get drawGrid() { return this._drawGrid; }
         set drawGrid(value) {
             this._drawGrid = value;
@@ -289,7 +336,12 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.color = color;
             this.width = width;
         }
-        set(ctx) {
+        /**
+         * Activates the stroke style for the graph
+         * @param {GraphContext} context 
+         */
+        set(context) {
+            const { ctx } = context;
             ctx.strokeStyle = this.color;
             ctx.lineWidth = this.width;
         }
@@ -298,13 +350,18 @@ const CanvasGraph = (function(module) { // eslint-disable-line
         constructor(color='rgba(0, 0, 0, 0)') {
             this.color = color;
         }
-        set(ctx) {
+        /**
+         * Activates the fill style for the graph
+         * @param {GraphContext} context 
+         */
+        set(context) {
+            const { ctx } = context;
             ctx.fillStyle = this.color;
         }
     }
 
     /**
-     * @typedef {object} GraphDrawerInfo
+     * @typedef {object} GraphContext
      * @property {CanvasRenderingContext2D} ctx
      * @property {function} gtc - Transforms graph coordinates to screen coordinates
      * @property {function} sgtc - Scales number from graph size to screen size
@@ -318,7 +375,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
     class GraphDrawer {
         constructor() { }
         /**
-         * @param {GraphDrawerInfo} info 
+         * @param {GraphContext} context 
          */
         draw() {}
     }
@@ -342,13 +399,13 @@ const CanvasGraph = (function(module) { // eslint-disable-line
         }
 
         /**
-         * @param {GraphDrawerInfo} info
+         * @param {GraphContext} context
          */
-        draw(info) {
-            const { ctx, gtc } = info;
+        draw(context) {
+            const { ctx, gtc } = context;
             const [ csx, csy ] = gtc(this.sx, this.sy);
             const [ cex, cey ] = gtc(this.ex, this.ey);
-            this.stroke.set(ctx);
+            this.stroke.set(context);
             ctx.beginPath();
             ctx.moveTo(csx, csy);
             ctx.lineTo(cex, cey);
@@ -375,14 +432,14 @@ const CanvasGraph = (function(module) { // eslint-disable-line
         }
 
         /**
-         * @param {GraphDrawerInfo} info
+         * @param {GraphContext} context
          */
-        draw(info) {
-            const { ctx, gtc, sgtc } = info;
+        draw(context) {
+            const { ctx, gtc, sgtc } = context;
             const [ ccx, ccy ] = gtc(this.cx, this.cy);
             const cr = sgtc(this.r);
-            this.stroke.set(ctx);
-            this.fill.set(ctx);
+            this.stroke.set(context);
+            this.fill.set(context);
             ctx.beginPath();
             ctx.ellipse(ccx, ccy, cr, cr, 0, 0, 2 * Math.PI);
             ctx.stroke();
@@ -410,12 +467,12 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.fill = fill;
         }
         /**
-         * @param {GraphDrawerInfo} info
+         * @param {GraphContext} context
          */
-        draw(info) {
-            const { ctx, gtc, sgtc } = info;
-            this.stroke.set(ctx);
-            this.fill.set(ctx);
+        draw(context) {
+            const { ctx, gtc, sgtc } = context;
+            this.stroke.set(context);
+            this.fill.set(context);
             const [ cx, cy ] = gtc(this.x, this.y);
             const cw = sgtc(this.w);
             const ch = sgtc(this.h);
@@ -437,19 +494,52 @@ const CanvasGraph = (function(module) { // eslint-disable-line
         }
 
         /**
-         * @param {GraphDrawerInfo} info
+         * @param {GraphContext} context
          */
-        draw(info) {
-            const { ctx, gtc, ctg, width } = info;
-            this.stroke.set(ctx);
+        draw(context) {
+            const { ctx, gtc, ctg, width } = context;
+            this.stroke.set(context);
             ctx.beginPath();
-            for (let sx = 0; sx <= width; sx++) {
+            for (let sx = 0; sx <= width; sx += 1) {
                 const [ x ] = ctg(sx, 0);
                 const fx = this.func(x);
                 if (sx === 0) ctx.moveTo(...gtc(x, fx));
                 else ctx.lineTo(...gtc(x, fx));
             }
             ctx.stroke();
+        }
+    }
+    /** Class to draw text to the screen */
+    class GraphText extends GraphDrawer {
+        /**
+         * Create a GraphText
+         * @param {string} text - Text to draw
+         * @param {number} x - Center x graph coordinate of text
+         * @param {*} y - Center y graph coordinate of text
+         * @param {*} height - Height in graph scale of text
+         * @param {*} stroke
+         * @param {*} fill 
+         */
+        constructor(text, x, y, height, stroke=new StrokeStyle(), fill=new FillStyle()) {
+            super();
+            this.text = text;
+            this.x = x;
+            this.y = y;
+            this.height = height;
+            this.stroke = stroke;
+            this.fill = fill;
+        }
+        /**
+         * @param {GraphContext} context
+         */
+        draw(context) {
+            const { ctx, sgtc, gtc } = context;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = `${Math.floor(2 * sgtc(this.height))}px sans-serif`;
+            this.stroke.set(context);
+            this.fill.set(context);
+            ctx.fillText(this.text, ...gtc(this.x, this.y));
         }
     }
 
@@ -470,6 +560,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
     Graph.GraphCircle = GraphCircle;
     Graph.GraphRect = GraphRect;
     Graph.GraphFunc = GraphFunc;
+    Graph.GraphText = GraphText;
     Graph.GraphDrawer = GraphDrawer;
 
     return module;
