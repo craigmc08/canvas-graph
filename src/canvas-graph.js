@@ -320,6 +320,16 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.drawGraph();
         }
 
+        /** Clears all things that are being drawn */
+        Clear() {
+            this.lines = [];
+            this.circles = [];
+            this.rects = [];
+            this.funcs = [];
+            this.others = [];
+            this.drawGraph();
+        }
+
         /**
          * @property {number} radY The y area of the graph screen
          */
