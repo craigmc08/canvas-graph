@@ -165,8 +165,11 @@ const CanvasGraph = (function(module) { // eslint-disable-line
 
             // Calculate new position for the center of the graph
             // to keep the mouse over the same graph unit
-            const mx = e.clientX;
-            const my = e.clientY;
+            const smx = e.clientX;
+            const smy = e.clientY;
+            const rect = this.canvas.getBoundingClientRect();
+            const mx = smx - rect.left;
+            const my = smy - rect.top;
             
             const newCenterX = (mx / width * 2) * (radX - newRadX) + center[0] + newRadX - radX;
             const newCenterY = (2 - my / height * 2) * (radY - newRadY) + center[1] + newRadY - radY;
@@ -200,7 +203,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             window.addEventListener('mouseup', this.dragEnd.bind(this));
             window.addEventListener('touchend', this.dragEnd.bind(this));
 
-            window.addEventListener('mousewheel', this.onScroll.bind(this));
+            this.canvas.addEventListener('mousewheel', this.onScroll.bind(this));
         }
 
         /**
