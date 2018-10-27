@@ -542,6 +542,109 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             ctx.fillText(this.text, ...gtc(this.x, this.y));
         }
     }
+    /** Class to wrap ctx for custom drawing in graph */
+    class GraphWrapper extends GraphDrawer {
+        /**
+         * Creates a graph wrapper, which calls the passed function with a
+         * ctx that automatically scales from graph to screen
+         * @param {function} drawer - Function to call with the wrapped ctx
+         */
+        constructor(drawer) {
+            super();
+            this.drawer = drawer;
+        }
+    
+        /**
+         * @param {GraphContext} context 
+         */
+        draw(context) {
+            const { ctx, gtc, sgtc } = context;
+            const affected = [
+                'arc',
+                'arcTo',
+                'bezierCurveTo',
+                'clearRect',
+                'drawImage',
+                'ellipse',
+                'fillRect',
+                'fillText',
+                'lineTo',
+                'moveTo',
+                'quadraticCurveTo',
+                'rect',
+                'strokeRect',
+                'strokeText',
+            ];
+            const wrappedCtx = new Proxy(ctx, {
+                get: (target, prop) => {
+                    if (prop === 'arc') {
+                        return (x, y, radius, startAngle, endAngle, anticlockwise=false) => {
+                            ctx.arc(...gtc(x, y), sgtc(radius), startAngle, endAngle, anticlockwise);
+                        };
+                    } else if (prop === 'arcTo') {
+                        return (x1, y1, x2, y2, radius) => {
+                            ctx.arcTo(...gtc(x1, y1), ...gtc(x2, y2), sgtc(radius));
+                        };
+                    } else if (prop === 'bezierCurveTo') {
+                        return (cp1x, cp1y, cp2x, cp2y, x, y) => {
+                            ctx.bezierCurveTo(...gtc(cp1x, cp1y), ...gtc(cp2x, cp2y), ...gtc(x, y));
+                        };
+                    } else if (prop === 'clearRect') {
+                        return (x, y, w, h) => {
+                            ctx.clearRect(...gtc(x, y), sgtc(w), -sgtc(h));
+                        };
+                    } else if (prop === 'drawImage') {
+                        return (image, dx, dy, dw, dh, sx, sy, sw, sh) => {
+                            ctx.drawImage(image, ...gtc(dx, dy), sgtc(dw), -sgtc(dh), ...gtc(sx, sy), sgtc(sw), -sgtc(sh));
+                        };
+                    } else if (prop === 'ellipse') {
+                        return (x, y, rx, ry, rot, startAngle, endAngle, anticlockwise=false) => {
+                            ctx.ellipse(...gtc(x, y), sgtc(rx), sgtc(ry), rot, startAngle, endAngle, anticlockwise);
+                        };
+                    } else if (prop === 'fillRect') {
+                        return (x, y, w, h) => {
+                            ctx.fillRect(...gtc(x, y), sgtc(w), -sgtc(h));
+                        };
+                    } else if (prop === 'fillText') {
+                        return (text, x, y, maxWidth=false) => {
+                            ctx.fillText(text, ...gtc(x, y), maxWidth === false ? undefined : sgtc(maxWidth));
+                        };
+                    } else if (prop === 'lineTo') {
+                        return (x, y) => {
+                            ctx.lineTo(...gtc(x, y));
+                        };
+                    } else if (prop === 'moveTo') {
+                        return (x, y) => {
+                            ctx.moveTo(...gtc(x, y));
+                        };
+                    } else if (prop === 'quadraticCurveTo') {
+                        return (cpx, cpy, x, y) => {
+                            ctx.quadraticCurveTo(...gtc(cpx, cpy), ...gtc(x, y));
+                        };
+                    } else if (prop === 'rect') {
+                        return (x, y, w, h) => {
+                            ctx.rect(...gtc(x, y), sgtc(w),-sgtc(h));
+                        };
+                    } else if (prop === 'strokeRect') {
+                        return (x, y, w, h) => {
+                            ctx.strokeRect(...gtc(x, y), sgtc(w), -sgtc(h));
+                        };
+                    } else if (prop === 'strokeText') {
+                        return (text, x, y, maxWidth=false) => {
+                            ctx.strokeText(text, ...gtc(x, y), maxWidth === false ? undefined : sgtc(maxWidth));
+                        };
+                    } else {
+                        return target[prop];
+                    }
+                },
+                set: (target, prop, value) => {
+                    if (!affected.includes(prop)) target[prop] = value;
+                },
+            });
+
+            this.drawer(wrappedCtx);
+        }
+    }
 
     /**
      * @typedef {Object} GraphOptions
@@ -561,6 +664,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
     Graph.GraphRect = GraphRect;
     Graph.GraphFunc = GraphFunc;
     Graph.GraphText = GraphText;
+    Graph.GraphWrapper = GraphWrapper;
     Graph.GraphDrawer = GraphDrawer;
 
     return module;
