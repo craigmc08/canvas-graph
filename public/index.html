@@ -25,24 +25,24 @@
             });
             graph.drawGrid = true;
             const func0 = new GraphFunc(x => Math.exp(-x*x), new StrokeStyle('rgb(230, 100, 100)', 3));
-            graph.AddFunc(func0);
-            graph.AddCircle(new GraphCircle(
+            graph.Add(func0, 0);
+            graph.Add(new GraphCircle(
                 0, 1,
                 0.03,
                 new StrokeStyle(),
                 new FillStyle('rgb(100, 150, 230)'),
-            ));
-            graph.AddCircle(new GraphCircle(
+            ), 2);
+            graph.Add(new GraphCircle(
                 1, Math.exp(-1),
                 0.03,
                 new StrokeStyle(),
                 new FillStyle('rgb(100, 150, 230)'),
-            ));
-            graph.AddLine(new GraphLine(
+            ), 2);
+            graph.Add(new GraphLine(
                 0, 1,
                 1, Math.exp(-1),
                 new StrokeStyle('black', 2),
-            ));
+            ), 1);
         </script>
     </body>
 </html>

@@ -41,16 +41,8 @@ const CanvasGraph = (function(module) { // eslint-disable-line
 
             // Things to draw
             this._drawGrid = false;
-            /** @property {GraphLine[]} lines */
-            this.lines = [];
-            /** @property {GraphCircle[]} circles */
-            this.circles = [];
-            /** @property {GraphRect[]} rects */
-            this.rects = [];
-            /** @property {GraphFunc[]} funcs */
-            this.funcs = [];
-            /** @property {GraphDrawer[]} others */
-            this.others = [];
+            /** @property {GraphDrawer[][]} layers */
+            this.layers = [];
 
             this.initEventHandlers();
             this.resize();
@@ -81,11 +73,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
                 width: this.width,
                 height: this.height,
             };
-            this.funcs.forEach(func => func.draw(graphInfo));
-            this.rects.forEach(rect => rect.draw(graphInfo));
-            this.lines.forEach(line => line.draw(graphInfo));
-            this.circles.forEach(circle => circle.draw(graphInfo));
-            this.others.forEach(other => other.draw(graphInfo));
+            this.layers.forEach(layer => layer.forEach(obj => obj.draw(graphInfo)));
         }
 
         /**
@@ -280,53 +268,41 @@ const CanvasGraph = (function(module) { // eslint-disable-line
         }
 
         /**
-         * Adds a line to the graph
-         * @param {GraphLine} line
+         * Adds a new object to graph
+         * @param {GraphDrawer} object - Object to add
+         * @param {number} layer - Which z-depth to put it at (higher = more on top) (whole number)
          */
-        AddLine(line) {
-            this.lines.push(line);
+        Add(object, layer) {
+            if (this.layers[layer] === undefined) this.layers[layer] = [];
+            this.layers[layer].push(object);
             this.drawGraph();
         }
         /**
-         * Adds a circle to the graph
-         * @param {GraphCircle} circle 
+         * Removes an object from the graph
+         * @param {GraphDrawer} object - Object to remove, must be a reference to same memory location
+         * @param {?number} layer - Layer to remove from, if not set, it will be found automatically
          */
-        AddCircle(circle) {
-            this.circles.push(circle);
+        Remove(object, layer=-1) {
+            if (layer === -1) {
+                const i = this.layers.reduce((i, lay, ci) => (
+                    i !== undefined ? i : lay.some(obj => obj == object) ? ci : i
+                ), undefined);
+                this.layers[i].filter(obj => obj != object);
+            } else {
+                this.layers[layer].filter(obj => obj != object);
+            }
             this.drawGraph();
         }
         /**
-         * Adds a rectangle to the graph
-         * @param {GraphRect} rect 
+         * Clears all things that are being drawn 
+         * @param {?...number} layers - Layers to remove, if not specified, removes layers
          */
-        AddRect(rect) {
-            this.rects.push(rect);
-            this.drawGraph();
-        }
-        /**
-         * Adds a function to the graph
-         * @param {GraphFunc} func 
-         */
-        AddFunc(func) {
-            this.funcs.push(func);
-            this.drawGraph();
-        }
-        /**
-         * Adds a custom drawer to the graph
-         * @param {GraphDrawer} other 
-         */
-        AddOther(other) {
-            this.others.push(other);
-            this.drawGraph();
-        }
-
-        /** Clears all things that are being drawn */
-        Clear() {
-            this.lines = [];
-            this.circles = [];
-            this.rects = [];
-            this.funcs = [];
-            this.others = [];
+        Clear(...layers) {
+            if (layers.length >= 1) {
+                layers.forEach(i => this.layers[i] = []);
+            } else {
+                this.layers = [];
+            }
             this.drawGraph();
         }
 

@@ -12,10 +12,10 @@ I assume you have a nice little html page template. In the body, put
         fullsize: true,
     });
     graph.drawGrid = true;
-    graph.AddFunc(new CanvasGraph.GraphFunc(
+    graph.Add(new CanvasGraph.GraphFunc(
         x => Math.exp(-x * x),
         new CanvasGraph.StrokeStyle('red', 3),
-    ));
+    ), 0);
 </script>
 ```
 This example creates a graph of the function e^(-x^2). You can click + drag to pan and scroll to zoom.
