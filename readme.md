@@ -78,9 +78,11 @@ Open `public/index.html` and start making czhanges and refreshing. idk any way t
 
 ## Plans
 - Add babel transpilation to allow library to work on older browsers
-- Make `GraphFunc` look better (smoother)
 - Add `GraphPoint` class that draws a circle that has same screen radius no matter the zoom
 - Make scale adjust based on zoom level
 - Major + minor grid lines
 - Scale on axes and sides of screen if no axis
 - More color customization (background, grid lines, etc.) of built in draw methods
+
+Less Important:
+- Continue work on `GraphFunc` smoothing (it looks a little better)
