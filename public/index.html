@@ -26,23 +26,48 @@
             graph.drawGrid = true;
             const func0 = new GraphFunc(x => Math.exp(-x*x), new StrokeStyle('rgb(230, 100, 100)', 3));
             graph.Add(func0, 0);
-            graph.Add(new GraphCircle(
+
+            const c0 = new GraphCircle(
                 0, 1,
                 0.03,
                 new StrokeStyle(),
                 new FillStyle('rgb(100, 150, 230)'),
-            ), 2);
-            graph.Add(new GraphCircle(
+            );
+            const c1 = new GraphCircle(
                 1, Math.exp(-1),
                 0.03,
                 new StrokeStyle(),
                 new FillStyle('rgb(100, 150, 230)'),
-            ), 2);
-            graph.Add(new GraphLine(
+            );
+            const l0 = new GraphLine(
                 0, 1,
                 1, Math.exp(-1),
                 new StrokeStyle('black', 2),
-            ), 1);
+            );
+
+            graph.Add(c0, 2);
+            graph.Add(c1, 2);
+            graph.Add(l0, 1);
+
+            let lt = Date.now();
+            let c0left = true;
+            function animate() {
+                requestAnimationFrame(animate);
+                const dt = (Date.now() - lt) / 1000;
+                lt = Date.now();
+
+                if (c0left) c0.cx -= dt;
+                else c0.cx += dt;
+
+                c0.cy = Math.exp(-(c0.cx**2));
+
+                l0.sx = c0.cx;
+                l0.sy = c0.cy;
+
+                if (c0left && c0.cx < -2) c0left = false;
+                else if (!c0left && c0.cx > 0.5) c0left = true;
+            }
+            animate();
         </script>
     </body>
 </html>

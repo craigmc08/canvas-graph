@@ -68,6 +68,11 @@ new GraphWrapper(ctx => {
 });
 ```
 
+### Other things
+Editing the properties of any built-in class (except `stroke` and `fill`) will automatically cause a redraw of the graph. To manually cause redraws, you can use `CanvasGraph#drawGraph()` or `GraphDrawer#setDirty()`. For example, in your own custom `GraphDrawer` classes, you can call the `setDirty()` method when you want the graph to be drawn again.
+
+This feature could be used for animating, such as in `public/index.html`
+
 ## Developing
 Open `public/index.html` and start making czhanges and refreshing. idk any way to do this better.
 

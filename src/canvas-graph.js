@@ -273,6 +273,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
          * @param {number} layer - Which z-depth to put it at (higher = more on top) (whole number)
          */
         Add(object, layer) {
+            object.onDirty(this.drawGraph.bind(this));
             if (this.layers[layer] === undefined) this.layers[layer] = [];
             this.layers[layer].push(object);
             this.drawGraph();
@@ -362,11 +363,27 @@ const CanvasGraph = (function(module) { // eslint-disable-line
 
     /** Base class for drawing things on the screen */
     class GraphDrawer {
-        constructor() { }
+        constructor() {
+            this.onDirties = [];
+        }
         /**
          * @param {GraphContext} context 
          */
         draw() {}
+
+        /**
+         * Adds a listener to the drawers `onDirty` event
+         * @param {function} cb 
+         */
+        onDirty(cb) {
+            this.onDirties.push(cb);
+        }
+        /**
+         * Triggers the `onDirty` listeners
+         */
+        setDirty() {
+            this.onDirties.forEach(cb => cb());
+        }
     }
     /** Class to straight point-to-point lines on the graph */
     class GraphLine extends GraphDrawer {
@@ -380,10 +397,10 @@ const CanvasGraph = (function(module) { // eslint-disable-line
          */
         constructor(sx, sy, ex, ey, stroke=new StrokeStyle()) {
             super();
-            this.sx = sx;
-            this.sy = sy;
-            this.ex = ex;
-            this.ey = ey;
+            this._sx = sx;
+            this._sy = sy;
+            this._ex = ex;
+            this._ey = ey;
             this.stroke = stroke;
         }
 
@@ -400,6 +417,11 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             ctx.lineTo(cex, cey);
             ctx.stroke();
         }
+
+        get sx() { return this._sx; } set sx(val) { this._sx = val; this.setDirty(); }
+        get sy() { return this._sy; } set sy(val) { this._sy = val; this.setDirty(); }
+        get ex() { return this._ex; } set ex(val) { this._ex = val; this.setDirty(); }
+        get ey() { return this._ey; } set ey(val) { this._ey = val; this.setDirty(); }
     }
     /** Class to draw circles on the graph */
     class GraphCircle extends GraphDrawer {
@@ -413,9 +435,9 @@ const CanvasGraph = (function(module) { // eslint-disable-line
          */
         constructor(cx, cy, r, stroke=new StrokeStyle(), fill=new FillStyle()) {
             super();
-            this.cx = cx;
-            this.cy = cy;
-            this.r = r;
+            this._cx = cx;
+            this._cy = cy;
+            this._r = r;
             this.stroke = stroke;
             this.fill = fill;
         }
@@ -434,6 +456,10 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             ctx.stroke();
             ctx.fill();
         }
+
+        get cx() { return this._cx; } set cx(val) { this._cx = val; this.setDirty(); }
+        get cy() { return this._cy; } set cy(val) { this._cy = val; this.setDirty(); }
+        get r() { return this._r; } set r(val) { this._r = val; this.setDirty(); }
     }
     /** Class to draw rectangles on the graph */
     class GraphRect extends GraphDrawer {
@@ -448,10 +474,10 @@ const CanvasGraph = (function(module) { // eslint-disable-line
          */
         constructor(x, y, w, h, stroke=new StrokeStyle(), fill=new FillStyle()) {
             super();
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
+            this._x = x;
+            this._y = y;
+            this._w = w;
+            this._h = h;
             this.stroke = stroke;
             this.fill = fill;
         }
@@ -468,6 +494,11 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             ctx.fillRect(cx, cy, cw, ch);
             ctx.strokeRect(cx, cy, cw, ch);
         }
+
+        get x() { return this._x; } set x(val) { this._x = val; this.setDirty(); }
+        get y() { return this._y; } set y(val) { this._y = val; this.setDirty(); }
+        get w() { return this._w; } set w(val) { this._w = val; this.setDirty(); }
+        get h() { return this._h; } set h(val) { this._h = val; this.setDirty(); }
     }
     /** Class to draw simple y(x) functions on the graph */
     class GraphFunc extends GraphDrawer {
@@ -478,7 +509,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
          */
         constructor(func, stroke=new StrokeStyle()) {
             super();
-            this.func = func;
+            this._func = func;
             this.stroke = stroke;
         }
 
@@ -497,6 +528,8 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             }
             ctx.stroke();
         }
+
+        get func() { return this._func; } set func(val) { this._func = val; this.setDirty(); }
     }
     /** Class to draw text to the screen */
     class GraphText extends GraphDrawer {
@@ -511,10 +544,10 @@ const CanvasGraph = (function(module) { // eslint-disable-line
          */
         constructor(text, x, y, height, stroke=new StrokeStyle(), fill=new FillStyle()) {
             super();
-            this.text = text;
-            this.x = x;
-            this.y = y;
-            this.height = height;
+            this._text = text;
+            this._x = x;
+            this._y = y;
+            this._height = height;
             this.stroke = stroke;
             this.fill = fill;
         }
@@ -530,6 +563,11 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.fill.set(context);
             ctx.fillText(this.text, ...gtc(this.x, this.y));
         }
+
+        get text() { return this._text; } set text(val) { this._text = val; this.setDirty(); }
+        get x() { return this._x; } set x(val) { this._x = val; this.setDirty(); }
+        get y() { return this._y; } set y(val) { this._y = val; this.setDirty(); }
+        get height() { return this._height; } set height(val) { this._height = val; this.setDirty(); }
     }
     /** Class to wrap ctx for custom drawing in graph */
     class GraphWrapper extends GraphDrawer {
