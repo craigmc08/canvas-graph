@@ -286,11 +286,11 @@ const CanvasGraph = (function(module) { // eslint-disable-line
         Remove(object, layer=-1) {
             if (layer === -1) {
                 const i = this.layers.reduce((i, lay, ci) => (
-                    i !== undefined ? i : lay.some(obj => obj == object) ? ci : i
+                    i !== undefined ? i : lay.some(obj => obj.id === object.id) ? ci : i
                 ), undefined);
                 this.layers[i].filter(obj => obj != object);
             } else {
-                this.layers[layer].filter(obj => obj != object);
+                this.layers[layer].filter(obj => obj.id !== object.id);
             }
             this.drawGraph();
         }
@@ -361,10 +361,13 @@ const CanvasGraph = (function(module) { // eslint-disable-line
      * @property {number} height - Height of canvas in pixels
      */
 
+    let graphDrawerIdCounter = 0;
     /** Base class for drawing things on the screen */
     class GraphDrawer {
         constructor() {
             this.onDirties = [];
+            /** @property {number} id - The unique id of this graph drawer */
+            this.id = ++graphDrawerIdCounter;
         }
         /**
          * @param {GraphContext} context 

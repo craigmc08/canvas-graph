@@ -51,21 +51,23 @@
 
             let lt = Date.now();
             let c0left = true;
+            let last_dt = Infinity;
             function animate() {
                 requestAnimationFrame(animate);
-                const dt = (Date.now() - lt) / 1000;
+                let dt = (Date.now() - lt) / 1000;
+                dt = dt > last_dt * 10 ? last_dt : dt;
                 lt = Date.now();
 
-                if (c0left) c0.cx -= dt;
-                else c0.cx += dt;
+                if (c0left) c0.cx -= dt * 0.2;
+                else c0.cx += dt * 0.2;
 
                 c0.cy = Math.exp(-(c0.cx**2));
 
                 l0.sx = c0.cx;
                 l0.sy = c0.cy;
 
-                if (c0left && c0.cx < -2) c0left = false;
-                else if (!c0left && c0.cx > 0.5) c0left = true;
+                if (c0left && c0.cx < -1) c0left = false;
+                else if (!c0left && c0.cx > 0.95) c0left = true;
             }
             animate();
         </script>
