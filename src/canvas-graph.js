@@ -236,7 +236,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             const { center, radX, radY, width, height } = this;
             const cx = (x - center[0] + radX) / radX / 2 * width;
             const cy = (1 - (y - center[1] + radY) / radY / 2) * height;
-            return [ Math.floor(cx), Math.floor(cy) ];
+            return [ cx, cy ];
         }
         /**
          * Scales a graph scalar to a canvas scalar
@@ -523,55 +523,18 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             const { ctx, gtc, ctg, width } = context;
             this.stroke.set(context);
 
-            // Get a list of points on the screen
-            const px_step = 8;
-            const points = [];
-            for (let sx = -px_step; sx <= width + px_step; sx += px_step) {
-                const [ x ] = ctg(sx, 0);
-                points.push([x, this.func(x)]);
-            }
-
-            // Utility functions for making bezier curves
-            const smoothing = 0.15;
-            const line = (a, b) => {
-                const lx = b[0] - a[0];
-                const ly = b[1] - a[1];
-                return {
-                    length: Math.sqrt(lx * lx + ly * ly),
-                    angle: Math.atan2(ly, lx),
-                };
-            };
-            const controlPoint = (current, previous, next, reverse) => {
-                const p = previous || current;
-                const n = next || current;
-                const l = line(p, n);
-
-                const angle = l.angle + (reverse ? Math.PI : 0);
-                const length = l.length * smoothing;
-                const x = current[0] + Math.cos(angle) * length;
-                const y = current[1] + Math.sin(angle) * length;
-                return [x, y];
-            }
-            const bezier = ctx => (point, i, a) => {
-                const cps = controlPoint(a[i-1], a[i-2], point);
-                const cpe = controlPoint(point, a[i-1], a[i+1], true);
-                ctx.bezierCurveTo(...gtc(...cps), ...gtc(...cpe), ...gtc(...point));
-            }
-
-            // Calculate bezier curves
-            const ctxBezier = bezier(ctx);
+            let moveTo = true;
             ctx.beginPath();
-            points.forEach((e, i, a) => {
-                if (i === 0) ctx.moveTo(e[0], e[1]);
-                else ctxBezier(e, i, a);
-            });
+            for (let sx = -4; sx < width + 4; sx++) {
+                const [ x ] = ctg(sx, 0);
+                if (moveTo) {
+                    moveTo = false;
+                    ctx.moveTo(...gtc(x, this.func(x)));
+                } else {
+                    ctx.lineTo(...gtc(x, this.func(x)));
+                }
+            }
             ctx.stroke();
-
-            /**
-             * Most of the code for this function was taken from:
-             * - https://codepen.io/francoisromain/pen/XabdZm
-             * - https://medium.com/@francoisromain/smooth-a-svg-path-with-functional-programming-1b9876b8bf7e
-             */
         }
 
         get func() { return this._func; } set func(val) { this._func = val; this.setDirty(); }
