@@ -81,5 +81,4 @@ Open `public/index.html` and start making czhanges and refreshing. idk any way t
 - Make scale adjust based on zoom level
 - Major + minor grid lines
 - Scale on axes and sides of screen if no axis
-- More color customization (background, grid lines, etc.) of built in draw methods
 - Make `GraphFunc` more intelligent so it recognizes asymptotes

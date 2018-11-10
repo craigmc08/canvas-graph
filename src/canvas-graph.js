@@ -37,6 +37,13 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this.container.appendChild(this.canvas);
             this.ctx = this.canvas.getContext('2d');
 
+            // Color settings
+            this._bgColor = 'white';
+            this._majorLineColor = 'rgb(150, 150, 150)';
+            this._minorLineColor = 'rgb(170, 170, 170)';
+            this._axisColor = 'black';
+            // End color settings
+
             this.dragging = false;
 
             // Things to draw
@@ -60,7 +67,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
          * Draws the entire graph
          */
         drawGraph() {
-            this.ctx.fillStyle = 'rgba(255, 255, 255)';
+            this.ctx.fillStyle = this.bgColor;
             this.ctx.fillRect(0, 0, this.width, this.height);
 
             if (this.drawGrid) this.drawLines();
@@ -84,7 +91,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             const { ctx, center, radX, radY, gtc } = this;
             const gridScale = 1;
 
-            ctx.strokeStyle = 'rgb(150, 150, 150)';
+            ctx.strokeStyle = this.majorLineColor;
             ctx.lineWidth = 1;
             const gridStartX = Math.floor((center[0] - radX) / gridScale) * gridScale;
             const gridEndX = center[0] + radX;
@@ -103,7 +110,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
                 ctx.stroke();
             }
 
-            ctx.strokeStyle = 'rgb(0, 0, 0)';
+            ctx.strokeStyle = this.axisColor;
             ctx.lineWidth = 2;
             if (0 >= center[0] - radX && 0 <= center[0] + radX) {
                 ctx.beginPath();
@@ -223,7 +230,6 @@ const CanvasGraph = (function(module) { // eslint-disable-line
                 this.canvas.style.top = '0';
                 this.canvas.style.bottom = '0';
             }
-            this.canvas.style.cursor = 'move';
         }
 
         /**
@@ -319,6 +325,22 @@ const CanvasGraph = (function(module) { // eslint-disable-line
             this._drawGrid = value;
             this.drawGraph();
         }
+
+        /** @property {string} bgColor - Color of background */
+        get bgColor() { return this._bgColor; }
+        set bgColor(val) { this._bgColor = val; this.drawGraph(); }
+
+        /** @property {string} majorLineColor - Color of major grid lines */
+        get majorLineColor() { return this._majorLineColor; }
+        set majorLineColor(val) { this._majorLineColor = val; this.drawGraph(); }
+
+        /** @property {string} minorLineColor - Color of minor grid lines */
+        get minorLineColor() { return this._minorLineColor; }
+        set minorLineColor(val) { this._minorLineColor = val; this.drawGraph(); }
+
+        /** @property {string} axisColor - Color of axis lines */
+        get axisColor() { return this._axisColor; }
+        set axisColor(val) { this._axisColor = val; this.drawGraph(); }
     }
 
     class StrokeStyle {

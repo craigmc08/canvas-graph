@@ -24,25 +24,29 @@
                 fullsize: true,
             });
             graph.drawGrid = true;
-            const func0 = new GraphFunc(x => Math.exp(-x*x), new StrokeStyle('rgb(230, 100, 100)', 3));
+            const func0 = new GraphFunc(x => Math.exp(-x*x), new StrokeStyle('rgb(190, 70, 70)', 3));
             graph.Add(func0, 0);
+
+            graph.bgColor = 'rgb(20, 20, 30)';
+            graph.majorLineColor = 'rgba(255, 255, 255, 0.3)';
+            graph.axisColor = 'white';
 
             const c0 = new GraphPoint(
                 0, 1,
                 5,
                 new StrokeStyle(),
-                new FillStyle('rgb(230, 100, 100)'),
+                new FillStyle('rgb(190, 70, 70)'),
             );
             const c1 = new GraphPoint(
                 1, Math.exp(-1),
                 5,
                 new StrokeStyle(),
-                new FillStyle('rgb(230, 100, 100)'),
+                new FillStyle('rgb(190, 70, 70)'),
             );
             const l0 = new GraphLine(
                 0, 1,
                 1, Math.exp(-1),
-                new StrokeStyle('black', 2),
+                new StrokeStyle('white', 3),
             );
 
             graph.Add(c0, 2);
