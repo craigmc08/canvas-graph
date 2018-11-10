@@ -464,6 +464,43 @@ const CanvasGraph = (function(module) { // eslint-disable-line
         get cy() { return this._cy; } set cy(val) { this._cy = val; this.setDirty(); }
         get r() { return this._r; } set r(val) { this._r = val; this.setDirty(); }
     }
+    /** Class to draw point (fixed screen size circles) on graph */
+    class GraphPoint extends GraphDrawer {
+        /**
+         * Create a Graph Point
+         * @param {number} cx - x coordinate (graph space)
+         * @param {number} cy - y coordainte (graph space)
+         * @param {number} r - radius (screen size)
+         * @param {StrokeStyle} stroke 
+         * @param {FillStyle} fill 
+         */
+        constructor(cx, cy, r, stroke=new StrokeStyle(), fill=new FillStyle()) {
+            super();
+            this._cx = cx;
+            this._cy = cy;
+            this._r = r;
+            this.stroke = stroke;
+            this.fill = fill;
+        }
+
+        /**
+         * @param {GraphContext} context 
+         */
+        draw(context) {
+            const { ctx, gtc } = context;
+            const [ x, y ] = gtc(this.cx, this.cy);
+            this.stroke.set(context);
+            this.fill.set(context);
+            ctx.beginPath();
+            ctx.ellipse(x, y, this.r, this.r, 0, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.fill();
+        }
+
+        get cx() { return this._cx; } set cx(val) { this._cx = val; this.setDirty(); }
+        get cy() { return this._cy; } set cy(val) { this._cy = val; this.setDirty(); }
+        get r() { return this._r; } set r(val) { this._r = val; this.setDirty(); }
+    }
     /** Class to draw rectangles on the graph */
     class GraphRect extends GraphDrawer {
         /**
@@ -677,7 +714,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
                 },
             });
 
-            this.drawer(wrappedCtx);
+            this.drawer(wrappedCtx, context);
         }
     }
 
@@ -696,6 +733,7 @@ const CanvasGraph = (function(module) { // eslint-disable-line
     Graph.FillStyle = FillStyle;
     Graph.GraphLine = GraphLine;
     Graph.GraphCircle = GraphCircle;
+    Graph.GraphPoint = GraphPoint;
     Graph.GraphRect = GraphRect;
     Graph.GraphFunc = GraphFunc;
     Graph.GraphText = GraphText;

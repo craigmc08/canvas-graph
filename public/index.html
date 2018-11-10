@@ -18,7 +18,7 @@
 
         <script src="../src/canvas-graph.js"></script>
         <script>
-            const { GraphLine, GraphCircle, GraphFunc, StrokeStyle, FillStyle } = CanvasGraph;
+            const { GraphLine, GraphPoint, GraphFunc, StrokeStyle, FillStyle } = CanvasGraph;
 
             const graph = new CanvasGraph(document.getElementById('canvasgraph'), {
                 fullsize: true,
@@ -27,17 +27,17 @@
             const func0 = new GraphFunc(x => Math.exp(-x*x), new StrokeStyle('rgb(230, 100, 100)', 3));
             graph.Add(func0, 0);
 
-            const c0 = new GraphCircle(
+            const c0 = new GraphPoint(
                 0, 1,
-                0.03,
+                5,
                 new StrokeStyle(),
-                new FillStyle('rgb(100, 150, 230)'),
+                new FillStyle('rgb(230, 100, 100)'),
             );
-            const c1 = new GraphCircle(
+            const c1 = new GraphPoint(
                 1, Math.exp(-1),
-                0.03,
+                5,
                 new StrokeStyle(),
-                new FillStyle('rgb(100, 150, 230)'),
+                new FillStyle('rgb(230, 100, 100)'),
             );
             const l0 = new GraphLine(
                 0, 1,

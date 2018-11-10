@@ -78,7 +78,6 @@ Open `public/index.html` and start making czhanges and refreshing. idk any way t
 
 ## Plans
 - Add babel transpilation to allow library to work on older browsers
-- Add `GraphPoint` class that draws a circle that has same screen radius no matter the zoom
 - Make scale adjust based on zoom level
 - Major + minor grid lines
 - Scale on axes and sides of screen if no axis
